@@ -9,6 +9,14 @@ hostName = "0.0.0.0"
 serverPort = 8080
 
 class MyServer(BaseHTTPRequestHandler):
+	def do_OPTIONS(self):
+		self.send_response(200, "ok")
+		self.send_header('Access-Control-Allow-Origin', '*')
+		self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+		self.send_header("Access-Control-Allow-Headers", "X-Requested-With")
+		self.send_header("Access-Control-Allow-Headers", "Content-Type")
+		self.end_headers()
+    
 	def test_proxy(self, ip):
 		proxy_servers = {
 		   'https': f"https://{ip}",
