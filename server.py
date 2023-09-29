@@ -14,10 +14,10 @@ class MyServer(BaseHTTPRequestHandler):
 		   'https': f"https://{ip}",
 		}
 
-
-		print(proxy_servers["https"])
+		test_url = 'https://ipinfo.io/json'
+		# test_url = 'https://google.com'
 		try:
-			data = requests.get('https://ipinfo.io/json', proxies=proxy_servers)
+			data = requests.get(test_url, proxies=proxy_servers, timeout=5)
 			 
 			return data.json()
 		except Exception as e:
