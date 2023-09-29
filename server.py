@@ -30,6 +30,7 @@ class MyServer(BaseHTTPRequestHandler):
 		data = self.test_proxy(ip)
 		self.send_response(200)
 		self.send_header("Content-type", "application/json")
+		self.send_header('Access-Control-Allow-Origin', '*')
 		self.end_headers()
 		self.wfile.write(bytes(json.dumps({'data': data}), "utf-8"))
 	def do_GET(self):
