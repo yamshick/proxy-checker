@@ -3,7 +3,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import time
 import urllib
 
-hostName = "/"
+hostName = "https://proxy-checker.onrender.com/"
 serverPort = 80
 
 class MyServer(BaseHTTPRequestHandler):
