@@ -42,6 +42,7 @@ class MyServer(BaseHTTPRequestHandler):
         
 		self.send_response(200)
 		self.send_header("Content-type", "text/html")
+		self.send_header('Access-Control-Allow-Origin', '*')
 		self.end_headers()
 		self.wfile.write(bytes("<html><head><title>https://pythonbasics.org</title></head>", "utf-8"))
 		self.wfile.write(bytes("<p>Request: %s</p>" % self.path, "utf-8"))
