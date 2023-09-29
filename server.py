@@ -3,17 +3,35 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import time
 import urllib
 import json
+import requests
 
 hostName = "0.0.0.0"
 serverPort = 8080
 
 class MyServer(BaseHTTPRequestHandler):
+	def test_proxy(self, ip):
+		proxy_servers = {
+		   'https': f"https://{ip}",
+		}
+
+
+		print(proxy_servers["https"])
+		try:
+			data = requests.get('https://ipinfo.io/json', proxies=proxy_servers)
+			 
+			return data.json()
+		except Exception as e:
+			print(e)
+			return None
+
+
 	def check_ip(self, query):
 		ip = query.split('=')[1]
+		data = self.test_proxy(ip)
 		self.send_response(200)
 		self.send_header("Content-type", "application/json")
 		self.end_headers()
-		self.wfile.write(bytes(json.dumps({'ip': ip}), "utf-8"))
+		self.wfile.write(bytes(json.dumps({'data': data}), "utf-8"))
 	def do_GET(self):
 		path = urllib.parse.urlparse(self.path)
 		print(path.query)
