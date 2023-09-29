@@ -1,12 +1,15 @@
 # Python 3 server example
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import time
+import urllib
 
-hostName = "localhost"
-serverPort = 8080
+hostName = "/"
+serverPort = 80
 
 class MyServer(BaseHTTPRequestHandler):
     def do_GET(self):
+        path = urllib.parse.urlparse(self.path)
+        print(path)
         self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.end_headers()
