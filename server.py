@@ -38,7 +38,12 @@ class MyServer(BaseHTTPRequestHandler):
 
     def check_ip(self, query):
         ip = query.split('=')[1]
-        data = self.test_proxy(ip)
+        data = None
+        try:
+	        data = self.test_proxy(ip)
+        except Exception as e:
+        	data = e
+	            
         self.send_response(200)
         self.send_header("Content-type", "application/json")
         self.send_header('Access-Control-Allow-Origin', '*')
