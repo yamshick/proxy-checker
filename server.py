@@ -8,61 +8,68 @@ import requests
 hostName = "0.0.0.0"
 serverPort = 8080
 
+
 class MyServer(BaseHTTPRequestHandler):
-	def do_OPTIONS(self):
-		self.send_response(200, "ok")
-		self.send_header('Access-Control-Allow-Origin', '*')
-		self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
-		self.send_header("Access-Control-Allow-Headers", "X-Requested-With")
-		self.send_header("Access-Control-Allow-Headers", "Content-Type")
-		self.end_headers()
-    
-	def test_proxy(self, ip):
-		proxy_servers = {
-		   'https': f"https://{ip}",
-		}
+    def end_headers (self):
+        self.send_header('Access-Control-Allow-Origin', '*')
+        SimpleHTTPRequestHandler.end_headers(self)
+    def do_OPTIONS(self):
+        self.send_response(200, "ok")
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+        self.send_header("Access-Control-Allow-Headers", "X-Requested-With")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.end_headers()
 
-		test_url = 'https://ipinfo.io/json'
-		# test_url = 'https://google.com'
-		try:
-			data = requests.get(test_url, proxies=proxy_servers, timeout=5)
-			 
-			return data.json()
-		except Exception as e:
-			print(e)
-			return None
+    def test_proxy(self, ip):
+        proxy_servers = {
+            'https': f"https://{ip}",
+        }
+
+        test_url = 'https://ipinfo.io/json'
+        # test_url = 'https://google.com'
+        try:
+            data = requests.get(test_url, proxies=proxy_servers, timeout=5)
+
+            return data.json()
+        except Exception as e:
+            print(e)
+            return None
+
+    def check_ip(self, query):
+        ip = query.split('=')[1]
+        data = self.test_proxy(ip)
+        self.send_response(200)
+        self.send_header("Content-type", "application/json")
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+        self.send_header("Access-Control-Allow-Headers", "X-Requested-With")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.end_headers()
+        self.wfile.write(bytes(json.dumps({'data': data}), "utf-8"))
+
+    def do_GET(self):
+        path = urllib.parse.urlparse(self.path)
+        print(path.query)
+        if path.path == '/check':
+            self.check_ip(path.query)
+            print('________ a am in')
+            return
+
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.end_headers()
+        self.wfile.write(
+            bytes("<html><head><title>https://pythonbasics.org</title></head>", "utf-8"))
+        self.wfile.write(bytes("<p>Request: %s</p>" % self.path, "utf-8"))
+        self.wfile.write(bytes("<body>", "utf-8"))
+        self.wfile.write(
+            bytes("<p>This is an example web server.</p>", "utf-8"))
+        self.wfile.write(bytes("</body></html>", "utf-8"))
 
 
-	def check_ip(self, query):
-		ip = query.split('=')[1]
-		data = self.test_proxy(ip)
-		self.send_response(200)
-		self.send_header("Content-type", "application/json")
-		self.send_header('Access-Control-Allow-Origin', '*')
-		self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
-		self.send_header("Access-Control-Allow-Headers", "X-Requested-With")
-		self.send_header("Access-Control-Allow-Headers", "Content-Type")
-		self.end_headers()
-		self.wfile.write(bytes(json.dumps({'data': data}), "utf-8"))
-	def do_GET(self):
-		path = urllib.parse.urlparse(self.path)
-		print(path.query)
-		if path.path == '/check':
-			self.check_ip(path.query)
-			print('________ a am in')
-			return
-        
-		self.send_response(200)
-		self.send_header("Content-type", "text/html")
-		self.send_header('Access-Control-Allow-Origin', '*')
-		self.end_headers()
-		self.wfile.write(bytes("<html><head><title>https://pythonbasics.org</title></head>", "utf-8"))
-		self.wfile.write(bytes("<p>Request: %s</p>" % self.path, "utf-8"))
-		self.wfile.write(bytes("<body>", "utf-8"))
-		self.wfile.write(bytes("<p>This is an example web server.</p>", "utf-8"))
-		self.wfile.write(bytes("</body></html>", "utf-8"))
-
-if __name__ == "__main__":        
+if __name__ == "__main__":
     webServer = HTTPServer((hostName, serverPort), MyServer)
     print("Server started http://%s:%s" % (hostName, serverPort))
 
